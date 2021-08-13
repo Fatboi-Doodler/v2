@@ -1,0 +1,73 @@
+.grid {
+    width: 100%;
+    height: 100%;
+    background-color: lightyellow;
+    position: relative;
+    font-size: 100px;
+    font-family: sans-serif, Arial, Helvetica;
+    text-align: center;
+}
+html, body {
+    height: 100%;
+}
+
+.player1 {
+    width: 75px;
+    height: 75px;
+    background-image: url('/img/fatboi.png');
+    position: absolute;
+}
+.player2 {
+    width: 75px;
+    height: 75px;
+    background-image: url('/img/kfcboi.png');
+    position: absolute;
+}
+
+.platform {
+    width: 85px;
+    height: 15px;
+    background-image: url('/img/platform.png');
+    position: absolute;
+}
+.platform-scored1 {
+    background-image: url('/img/platform-scored1.png');
+}
+.platform-scored2 {
+    background-image: url('/img/platform-scored2.png');
+}
+
+.gameover {
+    width: 200px;
+    height: 200px;
+    margin: auto;
+    background-image: url('/img/game_over.png');
+}
+.icon1 {
+    background-image: url('/img/fatboi.png');
+    background-size: 40px;
+    width:40px;
+    height:40px;
+    top:0;
+    position: absolute;
+}
+.icon2 {
+    background-image: url('/img/kfcboi.png');
+    background-size: 40px;
+    width:40px;
+    height:40px;
+    top:40px;
+    position: absolute;
+}
+.score1 {
+    font-size: 40px;
+    left:50px;
+    top:0;
+    position: absolute;
+}
+.score2 {
+    font-size: 40px;
+    left:50px;
+    top:40px;
+    position: absolute;
+}

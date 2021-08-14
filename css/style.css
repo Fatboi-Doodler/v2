@@ -23,6 +23,12 @@ html, body {
     background-image: url('../img/kfcboi.png');
     position: absolute;
 }
+.npc {
+    width: 75px;
+    height: 75px;
+    background-image: url('../img/opdude.png');
+    position: absolute;
+}
 
 .platform {
     width: 85px;

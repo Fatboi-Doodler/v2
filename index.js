@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const Gameover = document.createElement('div')
     const Platforms = []
     const Players = []
+    const NPCs = []
     const Keys = {}
     const DIRS = ["left", "up", "down", "right", "still"]
     const MAX_JUMP = 250;
@@ -70,12 +71,10 @@ document.addEventListener('DOMContentLoaded', () => {
             this.id = num
             this.visual = document.createElement('div')
             Grid.appendChild(this.visual)
-            this.fallId = null
-            this.jumpId = null
-            this.isFalling = false
+            this.renderId = null
+            this.coolId = null
             this.width = 75
             this.height = 75
-            this.maxJump = MAX_JUMP
             this.cooldownDiv = document.createElement('div')
             this.cooldownDiv.style.left = MAX_WIDTH * (2 * this.id - 1) / 4 + "px";
             this.cooldownDiv.style.bottom = MAX_HEIGHT/2 + "px";
@@ -87,7 +86,6 @@ document.addEventListener('DOMContentLoaded', () => {
             Grid.appendChild(this.scoreDiv)
             Grid.appendChild(this.cooldownDiv)
             this.restart()
-            this.jumpEnd = this.bottom + this.maxJump
         }
 
         move(x, y){
@@ -99,71 +97,71 @@ document.addEventListener('DOMContentLoaded', () => {
             this.visual.style.left = this.left + 'px';
         }
 
-        jump() {
-            this.isFalling = false
-            clearInterval(this.fallId)
-            const boost = (this.id == 1 && Keys["w"] == true ) || (this.id == 2 && Keys["ArrowUp"] == true)
-            this.jumpEnd = this.bottom + (boost ? this.maxJump * 1.5 : this.maxJump)
-            this.jumpId = setInterval( () => {
-                const diff = this.jumpEnd - this.bottom
-                const delta = diff / this.maxJump * 8;
-                this.move(0, delta)
-                if(this.bottom > this.jumpEnd - this.height){
-                    this.fall();
-                }
-            }, 20)
-        }
+        render() {
+            this.vSpeed = 0
+            let lastTick = Date.now();
+            this.renderId = setInterval( () => {
 
-        fall() {
-            clearInterval(this.jumpId)
-            clearInterval(this.fallId)
-            this.isFalling = true
-            this.fallId = setInterval( () => {
-                const diff = this.jumpEnd - this.bottom
-                const delta = Math.min( diff / this.maxJump * 8, 8);
-                this.move(0, -delta);
-                let jump = false;
-                for(let platform of Platforms) {
-                    if( this.bottom >= platform.bottom &&
-                        this.bottom <= platform.bottom + platform.height &&
-                        this.left + this.width > platform.left &&
-                        this.left < platform.left + platform.width &&
-                        !(this.id == 2 && Keys["ArrowDown"]) &&
-                        !(this.id == 1 && Keys["s"]) &&
-                        this.isFalling )
+                const tdelta = (Date.now() - lastTick) / 1000;
+                for(let npc of NPCs){
+                    if(this.bottom >= npc.bottom &&
+                        this.bottom <= npc.bottom + npc.height &&
+                        this.left + this.width > npc.left &&
+                        this.left < npc.left + npc.width)
                     {
-                        if(!platform.scored){
-                            if(!IsGameover) this.scoreDiv.innerHTML = ++this.score;
-                            platform.scored = this.id;
-                            platform.visual.classList.add(`platform-scored${this.id}`)
-                            if(!Platforms.find(platform => platform.scored == 0)) gameover();
-                        }
-                        jump = true;
-                    }
-                    if( this.bottom < 0 ){
                         this.die();
                         break;
                     }
                 }
-                if(jump){
-                    this.jump()
+                if(this.vSpeed < 0){
+                    for(let platform of Platforms){
+                        if( this.bottom >= platform.bottom &&
+                            this.bottom <= platform.bottom + platform.height &&
+                            this.left + this.width > platform.left &&
+                            this.left < platform.left + platform.width &&
+                            !(this.id == 2 && Keys["ArrowDown"]) &&
+                            !(this.id == 1 && Keys["s"]))
+                        {
+                            if(!platform.scored){
+                                if(!IsGameover) this.scoreDiv.innerHTML = ++this.score;
+                                platform.scored = this.id;
+                                platform.visual.classList.add(`platform-scored${this.id}`)
+                                if(!Platforms.find(platform => platform.scored == 0)) gameover();
+                            }
+                            if(this.id == 2 && Keys["ArrowUp"] || this.id == 1 && Keys["w"]){
+                                this.vSpeed = 400;
+                            }
+                            else {
+                                this.vSpeed = 250;
+                            }
+                        }
+                        if( this.bottom < 0 ){
+                            this.die();
+                            break;
+                        }
+                    }
                 }
+                const delta = this.vSpeed * tdelta + 400 * tdelta**2
+                this.vSpeed -= 400 * tdelta
+                if(this.vSpeed < -300) this.vSpeed = -300
+                this.move(0, delta)
+                lastTick = Date.now();
 
             }, 20)
         }
 
         die() {
-            clearInterval(this.fallId)
-            this.isFalling = false
+            clearInterval(this.renderId)
             this.stop()
             let countdown = COOLDOWN_SEC
             this.cooldownDiv.classList.add(`countdown`)
             this.cooldownDiv.innerHTML = countdown;
-            const coolId = setInterval(()=> {
+            this.coolId = setInterval(()=> {
                 this.cooldownDiv.innerHTML = --countdown;
+                console.log(countdown)
             }, 1000)
             setTimeout(() => {
-                clearInterval(coolId)
+                clearInterval(this.coolId)
                 this.cooldownDiv.classList.remove(`countdown`)
                 this.cooldownDiv.innerHTML = "";
                 this.spawn()
@@ -171,8 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         stop() {
-            clearInterval(this.jumpId)
-            clearInterval(this.fallId)
+            clearInterval(this.renderId)
             this.visual.classList.remove(`player${this.id}`)
         }
 
@@ -185,9 +182,77 @@ document.addEventListener('DOMContentLoaded', () => {
         spawn() {
             this.left = MAX_WIDTH * (2 * this.id - 1) / 4;
             this.bottom = MAX_HEIGHT/2
-            this.startJump = this.bottom
-            this.fall()
+            this.render()
             this.visual.classList.add(`player${this.id}`)
+        }
+    }
+
+    class NPC {
+        constructor(num) {
+            this.id = num
+            this.visual = document.createElement('div')
+            Grid.appendChild(this.visual)
+            this.renderId = null
+            this.width = 75
+            this.height = 75
+            this.spawn()
+            this.speed = Math.random()>0.5 ? 2 : -2;
+        }
+
+        move(x, y){
+            this.bottom += y;
+            this.left += x;
+            if(this.left < 0){
+                this.left = 0;
+                this.speed = Math.abs(this.speed)
+            }
+            if(this.left + this.width + 10 > MAX_WIDTH) {
+                this.left = MAX_WIDTH - this.width - 10;
+                this.speed = - Math.abs(this.speed)
+            }
+            this.visual.style.bottom = this.bottom + 'px';
+            this.visual.style.left = this.left + 'px';
+        }
+
+        render() {
+            this.vSpeed = 0
+            let lastTick = Date.now();
+            this.renderId = setInterval( () => {
+
+                const tdelta = (Date.now() - lastTick) / 1000;
+                if(this.vSpeed < 0){
+                    for(let platform of Platforms){
+                        if( this.bottom >= platform.bottom &&
+                            this.bottom <= platform.bottom + platform.height &&
+                            this.left + this.width > platform.left &&
+                            this.left < platform.left + platform.width )
+                        {
+                            this.vSpeed = 100;
+                        }
+                    }
+                    if( this.bottom < 0 ){
+                        this.die();
+                    }
+                }
+                const delta = this.vSpeed * tdelta + 400 * tdelta**2
+                this.vSpeed -= 400 * tdelta
+                if(this.vSpeed < -300) this.vSpeed = -300
+                this.move(this.speed, delta)
+                lastTick = Date.now();
+
+            }, 20)
+        }
+
+        die() {
+            clearInterval(this.renderId)
+            this.spawn()
+        }
+
+        spawn() {
+            this.left = Math.random() * MAX_WIDTH;
+            this.bottom = MAX_HEIGHT
+            this.render()
+            this.visual.classList.add(`npc`)
         }
     }
 
@@ -267,6 +332,7 @@ document.addEventListener('DOMContentLoaded', () => {
         movePlatforms()
         Players.push(new Doodler(1))
         Players.push(new Doodler(2))
+        NPCs.push(new NPC(1))
     }
     start()
 });

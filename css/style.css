@@ -71,3 +71,7 @@ html, body {
     top:40px;
     position: absolute;
 }
+.countdown {
+    font-size: 60px;
+    position: absolute;
+}

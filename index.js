@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const MAX_WIDTH = document.body.offsetWidth || 1000
     const MAX_HEIGHT = document.body.offsetHeight || 800
     const PLATFORM_COUNT = Math.floor( MAX_WIDTH / 40) || 10
+    const COOLDOWN_SEC = 5
     let platId
     let IsGameover = false;
 
@@ -58,6 +59,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // gravity
+    // S = v0*t + gt^2
+    // v = v0 + gt
+    // jump: initial speed 200, time = 0.02==50fps
+    // delta = 200 * 0.02 - 0.5*9.8*0.02^2
+    // v = 200 - 9.8*0.02 = 199.804
     class Doodler {
         constructor(num) {
             this.id = num
@@ -69,12 +76,16 @@ document.addEventListener('DOMContentLoaded', () => {
             this.width = 75
             this.height = 75
             this.maxJump = MAX_JUMP
+            this.cooldownDiv = document.createElement('div')
+            this.cooldownDiv.style.left = MAX_WIDTH * (2 * this.id - 1) / 4 + "px";
+            this.cooldownDiv.style.bottom = MAX_HEIGHT/2 + "px";
             this.scoreDiv = document.createElement('div')
             this.scoreDiv.classList.add(`score${this.id}`)
             const icon = document.createElement('div')
             icon.classList.add(`icon${this.id}`)
             Grid.appendChild(icon)
             Grid.appendChild(this.scoreDiv)
+            Grid.appendChild(this.cooldownDiv)
             this.restart()
             this.jumpEnd = this.bottom + this.maxJump
         }
@@ -111,6 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const diff = this.jumpEnd - this.bottom
                 const delta = Math.min( diff / this.maxJump * 8, 8);
                 this.move(0, -delta);
+                let jump = false;
                 for(let platform of Platforms) {
                     if( this.bottom >= platform.bottom &&
                         this.bottom <= platform.bottom + platform.height &&
@@ -126,15 +138,36 @@ document.addEventListener('DOMContentLoaded', () => {
                             platform.visual.classList.add(`platform-scored${this.id}`)
                             if(!Platforms.find(platform => platform.scored == 0)) gameover();
                         }
-                        this.jump()
-                        break;
+                        jump = true;
                     }
                     if( this.bottom < 0 ){
-                        gameover();
+                        this.die();
+                        break;
                     }
+                }
+                if(jump){
+                    this.jump()
                 }
 
             }, 20)
+        }
+
+        die() {
+            clearInterval(this.fallId)
+            this.isFalling = false
+            this.stop()
+            let countdown = COOLDOWN_SEC
+            this.cooldownDiv.classList.add(`countdown`)
+            this.cooldownDiv.innerHTML = countdown;
+            const coolId = setInterval(()=> {
+                this.cooldownDiv.innerHTML = --countdown;
+            }, 1000)
+            setTimeout(() => {
+                clearInterval(coolId)
+                this.cooldownDiv.classList.remove(`countdown`)
+                this.cooldownDiv.innerHTML = "";
+                this.spawn()
+            }, COOLDOWN_SEC * 1000)
         }
 
         stop() {
@@ -145,13 +178,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         restart() {
             this.score = 0;
+            this.scoreDiv.innerHTML = "0"
+            this.spawn()
+        }
+
+        spawn() {
             this.left = MAX_WIDTH * (2 * this.id - 1) / 4;
             this.bottom = MAX_HEIGHT/2
             this.startJump = this.bottom
-            this.visual.classList.add(`player${this.id}`)
-            this.scoreDiv.innerHTML = "0"
-            this.move(0, 0)
             this.fall()
+            this.visual.classList.add(`player${this.id}`)
         }
     }
 
@@ -202,6 +238,7 @@ document.addEventListener('DOMContentLoaded', () => {
         else {
             Keys[e.key] = true;
         }
+        e.preventDefault();
     }, false);
 
     document.addEventListener('keyup', (e) => {

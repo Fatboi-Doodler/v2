@@ -100,6 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
         render() {
             this.vSpeed = 0
             let lastTick = Date.now();
+            clearInterval(this.renderId)
             this.renderId = setInterval( () => {
 
                 const tdelta = (Date.now() - lastTick) / 1000;
@@ -227,7 +228,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             this.left + this.width > platform.left &&
                             this.left < platform.left + platform.width )
                         {
-                            this.vSpeed = 100;
+                            this.vSpeed = Math.max(100, Math.random() * 400);
                         }
                     }
                     if( this.bottom < 0 ){
@@ -274,9 +275,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function gameover(){
 
         IsGameover = true;
-        for(let p of Players){
-            p.stop()
-        }
+        // for(let p of Players){
+        //     p.stop()
+        // }
         Gameover.classList.add('gameover')
         Grid.appendChild(Gameover)
     }
@@ -311,6 +312,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }, false);
 
     setInterval( () => {
+        if(IsGameover) return;
         if(Keys['ArrowLeft']) {
             Players[1].move(-4, 0);
         }
@@ -333,6 +335,8 @@ document.addEventListener('DOMContentLoaded', () => {
         Players.push(new Doodler(1))
         Players.push(new Doodler(2))
         NPCs.push(new NPC(1))
+        NPCs.push(new NPC(2))
+        NPCs.push(new NPC(3))
     }
     start()
 });

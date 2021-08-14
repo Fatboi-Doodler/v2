@@ -14,37 +14,37 @@ html, body {
 .player1 {
     width: 75px;
     height: 75px;
-    background-image: url('/img/fatboi.png');
+    background-image: url('../img/fatboi.png');
     position: absolute;
 }
 .player2 {
     width: 75px;
     height: 75px;
-    background-image: url('/img/kfcboi.png');
+    background-image: url('../img/kfcboi.png');
     position: absolute;
 }
 
 .platform {
     width: 85px;
     height: 15px;
-    background-image: url('/img/platform.png');
+    background-image: url('../img/platform.png');
     position: absolute;
 }
 .platform-scored1 {
-    background-image: url('/img/platform-scored1.png');
+    background-image: url('../img/platform-scored1.png');
 }
 .platform-scored2 {
-    background-image: url('/img/platform-scored2.png');
+    background-image: url('../img/platform-scored2.png');
 }
 
 .gameover {
     width: 200px;
     height: 200px;
     margin: auto;
-    background-image: url('/img/game_over.png');
+    background-image: url('../img/game_over.png');
 }
 .icon1 {
-    background-image: url('/img/fatboi.png');
+    background-image: url('../img/fatboi.png');
     background-size: 40px;
     width:40px;
     height:40px;
@@ -52,7 +52,7 @@ html, body {
     position: absolute;
 }
 .icon2 {
-    background-image: url('/img/kfcboi.png');
+    background-image: url('../img/kfcboi.png');
     background-size: 40px;
     width:40px;
     height:40px;

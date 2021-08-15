@@ -81,3 +81,10 @@ html, body {
     font-size: 60px;
     position: absolute;
 }
+.killcount {
+    position: absolute;
+    left: 5px;
+    top: 35px;
+    font-size: 15px;
+    color: red
+  }

@@ -1,4 +1,4 @@
-import { Grid, MAX_WIDTH, MAX_HEIGHT, Platforms, NPCs, Keys, IsGameover, G, gameover } from '../index.js'
+import { Grid, MAX_WIDTH, MAX_HEIGHT, Platforms, NPCs, IsGameover, G, gameover } from '../index.js'
 
 const JUMP_SPEED = 250
 const JUMP_BOOST = 200
@@ -15,9 +15,13 @@ export class Doodler {
         Grid.appendChild(this.visual)
         this.renderId = null
         this.coolId = null
+        this.spawnID = null
         this.width = 75
         this.height = 75
         this.age = 0
+        this.speed = 0
+        this.boosting = false
+        this.crawling = false
         this.cooldownDiv = document.createElement('div')
         this.cooldownDiv.style.left = MAX_WIDTH * (2 * this.id - 1) / 4 + "px";
         this.cooldownDiv.style.bottom = MAX_HEIGHT/2 + "px";
@@ -43,8 +47,10 @@ export class Doodler {
     render() {
         this.vSpeed = 0
         let lastTick = Date.now();
+        this.cooldownDiv.innerHTML = ''
         clearInterval(this.coolId)
         clearInterval(this.renderId)
+        clearInterval(this.spawnId)
         this.renderId = setInterval( () => {
 
             if( this.bottom < 0 ){
@@ -59,6 +65,17 @@ export class Doodler {
                     this.left + this.width > npc.left &&
                     this.left < npc.left + npc.width)
                 {
+                    if( this.vSpeed < 0 &&
+                        this.bottom > npc.bottom + npc.height/2 &&
+                        this.bottom <= npc.bottom + npc.height)
+                    {
+                        if(!IsGameover){
+                            this.kills++;
+                            this.scoreDiv.innerHTML = ++this.score;
+                        }
+                        npc.die()
+                        return;
+                    }
                     npc.killcount.innerHTML = ++npc.kills
                     this.die()
                     return
@@ -70,8 +87,7 @@ export class Doodler {
                         this.bottom <= platform.bottom + platform.height &&
                         this.left + this.width > platform.left &&
                         this.left < platform.left + platform.width &&
-                        !(this.id == 2 && Keys["ArrowDown"]) &&
-                        !(this.id == 1 && Keys["s"]))
+                        !this.crawling)
                     {
                         if(!platform.scored){
                             if(!IsGameover) this.scoreDiv.innerHTML = ++this.score;
@@ -80,7 +96,7 @@ export class Doodler {
                             if(!Platforms.find(platform => platform.scored == 0)) gameover();
                         }
                         this.vSpeed = JUMP_SPEED
-                        if(this.id == 2 && Keys["ArrowUp"] || this.id == 1 && Keys["w"]){
+                        if(this.boosting){
                             this.vSpeed += JUMP_BOOST;
                         }
                     }
@@ -90,7 +106,7 @@ export class Doodler {
             const tdelta = (Date.now() - lastTick) / 1000;
             const sdelta = this.vSpeed * tdelta + 0.5 * G * tdelta**2
             this.vSpeed -= G * tdelta
-            this.move(0, sdelta)
+            this.move(this.speed, sdelta)
             lastTick = Date.now();
             this.age += tdelta
 
@@ -106,7 +122,7 @@ export class Doodler {
         this.coolId = setInterval(()=> {
             this.cooldownDiv.innerHTML = --countdown;
         }, 1000)
-        setTimeout(() => {
+        this.spawnId = setTimeout(() => {
             this.cooldownDiv.classList.remove(`countdown`)
             this.cooldownDiv.innerHTML = "";
             this.spawn()
@@ -125,7 +141,7 @@ export class Doodler {
     }
 
     spawn() {
-        this.left = MAX_WIDTH * (2 * this.id - 1) / 4;
+        this.left = MAX_WIDTH * (2 * this.id - 1) / 4
         this.bottom = MAX_HEIGHT/2
         this.render()
         this.visual.classList.add(`player${this.id}`)

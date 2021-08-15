@@ -10,7 +10,6 @@ export const G = 400
 const Players = []
 export const Platforms = []
 export const NPCs = []
-export const Keys = {}
 export let IsGameover = false;
 
 const PLATFORM_COUNT = Math.floor( MAX_WIDTH / 50) || PLATFORM_COUNT
@@ -55,39 +54,41 @@ function restart() {
     })
 }
 
-document.addEventListener('keydown', (e) => {
-    if(IsGameover){
-        if(e.key === ' ') {
-            restart()
-        }
+function keyHandler(e) {
+    if(e.key === ' ' && e.type == "keyup" && IsGameover) {
+        restart()
     }
-    else {
-        Keys[e.key] = true;
-    }
-    e.preventDefault();
-}, false);
-
-document.addEventListener('keyup', (e) => {
-    Keys[e.key] = false;
-}, false);
-
-setInterval( () => {
     if(IsGameover) return;
-    if(Keys['ArrowLeft']) {
-        Players[1].move(-4, 0);
+    if(e.key == 'ArrowLeft') {
+        Players[1].speed = e.type == "keydown" ? -4 : (Players[1].speed == 4 ? 4 : 0)
     }
-    if (Keys['ArrowRight']) {
-        Players[1].move(4, 0);
+    if (e.key == 'ArrowRight') {
+        Players[1].speed = e.type == "keydown" ? 4 : (Players[1].speed == -4 ? -4 : 0)
     }
-    if(Keys['a']) {
-        Players[0].move(-4, 0);
+    if (e.key == 'ArrowUp') {
+        Players[1].boosting = e.type == "keydown" ? true : false
     }
-    if (Keys['d']) {
-        Players[0].move(4, 0);
+    if (e.key == 'ArrowDown') {
+        Players[1].crawling = e.type == "keydown" ? true : false
+    }
+    if(e.key == 'a') {
+        Players[0].speed = e.type == "keydown" ? -4 : (Players[0].speed == 4 ? 4 : 0)
+    }
+    if (e.key == 'd') {
+        Players[0].speed = e.type == "keydown" ? 4 : (Players[0].speed == -4 ? -4 : 0)
+    }
+    if (e.key == 'w') {
+        Players[0].boosting = e.type == "keydown" ? true : false
+    }
+    if (e.key == 's') {
+        Players[0].crawling = e.type == "keydown" ? true : false
     }
 
-}, 20)
+    e.preventDefault();
+}
 
+document.addEventListener('keydown', keyHandler, false);
+document.addEventListener('keyup', keyHandler, false);
 
 function start() {
     createPlatforms()

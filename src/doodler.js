@@ -1,9 +1,10 @@
-import { Grid, MAX_WIDTH, MAX_HEIGHT, Platforms, NPCs, IsGameover, G, gameover } from '../index.js'
+import { Grid, MAX_WIDTH, MAX_HEIGHT, Platforms, NPCs, Drops, IsGameover, G, gameover } from '../index.js'
 
 const JUMP_SPEED = 250
 const JUMP_BOOST = 200
 const COOLDOWN_SEC = 5
 const AGE_INVINCIBILITY_SEC = 3
+const HOTDOG_DURATION_SEC = 5
 
 // gravity
 // S = v0*t + 0.5*gt^2
@@ -16,11 +17,14 @@ export class Doodler {
         this.renderId = null
         this.coolId = null
         this.spawnID = null
+        this.invincibleId = null
         this.width = 75
         this.height = 75
         this.dying = false
+        this.invincible = false
         this.age = 0
         this.speed = 0
+        this.drops = 0
         this.boosting = false
         this.crawling = false
         this.cooldownDiv = document.createElement('div')
@@ -59,16 +63,33 @@ export class Doodler {
                 return
             }
 
+            for(let i in Drops){
+                const item = Drops[i]
+                if( this.bottom + this.height >= item.bottom &&
+                    this.bottom <= item.bottom + item.height &&
+                    this.left + this.width >= item.left &&
+                    this.left <= item.left + item.width &&
+                    !this.dying)
+                {
+                    item.destroy()
+                    Drops.splice(i, 1)
+                    this.drops++
+                    this.setInvincible(HOTDOG_DURATION_SEC * 1000)
+                    break;
+                }
+            }
+
             for(let npc of NPCs){
                 if( this.age > AGE_INVINCIBILITY_SEC &&
-                    this.bottom >= npc.bottom &&
+                    this.bottom + this.height >= npc.bottom &&
                     this.bottom <= npc.bottom + npc.height &&
-                    this.left + this.width > npc.left &&
-                    this.left < npc.left + npc.width &&
+                    this.left + this.width >= npc.left &&
+                    this.left <= npc.left + npc.width &&
                     !npc.dying &&
                     !this.dying)
                 {
-                    if( this.vSpeed < 0 &&
+                    if( this.invincible ||
+                        this.vSpeed < 0 &&
                         this.bottom > npc.bottom + npc.height/2 &&
                         this.bottom <= npc.bottom + npc.height)
                     {
@@ -82,7 +103,7 @@ export class Doodler {
                     else {
                         npc.killcount.innerHTML = ++npc.kills
                         this.dying = true
-                        this.visual.classList.add('deadx`')
+                        this.visual.classList.add('dead')
                         break
                     }
                 }
@@ -117,6 +138,16 @@ export class Doodler {
             this.age += tdelta
 
         }, 20)
+    }
+
+    setInvincible(duration) {
+        this.visual.classList.add('invincible')
+        clearTimeout(this.invincibleId)
+        this.invincible = true
+        this.invincibleId = setTimeout(() => {
+            this.visual.classList.remove(`invincible`)
+            this.invincible = false
+        }, duration)
     }
 
     die() {

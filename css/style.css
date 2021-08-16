@@ -31,7 +31,14 @@ html, body {
     background-image: url('../img/opdude.png');
     position: absolute;
 }
-
+.hotdog {
+    width: 50px;
+    height: 50px;
+    background-size: 50px;
+    background-image: url('../img/hotdog.png');
+    background-repeat: no-repeat;
+    position: absolute;
+}
 .platform {
     width: 85px;
     height: 15px;
@@ -96,5 +103,5 @@ html, body {
     opacity: 0.4;
 }
 .invincible {
-    filter: drop-shadow(0px 0px 10px orange);
+    filter: drop-shadow(0px 0px 10px blue);
 }

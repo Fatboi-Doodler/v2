@@ -1,6 +1,7 @@
 import { Platform } from './src/platform.js'
 import { Doodler } from './src/doodler.js'
 import { NPC } from './src/npc.js'
+import { Drop } from './src/drop.js'
 
 export const Grid = document.querySelector('.grid')
 export const MAX_WIDTH = document.body.offsetWidth
@@ -8,18 +9,31 @@ export const MAX_HEIGHT = document.body.offsetHeight
 export const G = 400
 
 const Players = []
+export const Drops = []
 export const Platforms = []
 export const NPCs = []
 export let IsGameover = false;
 
+const MAX_DROPS = 5
+const DROP_INTERVAL_SEC = 20
 const PLATFORM_COUNT = Math.floor( MAX_WIDTH / 50) || PLATFORM_COUNT
 const GameoverDiv = document.createElement('div')
 Grid.appendChild(GameoverDiv)
+
+let DropsId = null
+
 
 function createPlatforms() {
     for(let i = 0; i < PLATFORM_COUNT; i++) {
         Platforms.push(new Platform())
     }
+}
+
+function startDrops() {
+
+    DropsId = setInterval(() => {
+        if(Drops.length < MAX_DROPS) Drops.push(new Drop())
+    }, DROP_INTERVAL_SEC * 1000)
 }
 
 function movePlatforms(){
@@ -93,6 +107,7 @@ document.addEventListener('keyup', keyHandler, false);
 function start() {
     createPlatforms()
     movePlatforms()
+    startDrops()
     Players.push(new Doodler(1))
     Players.push(new Doodler(2))
     NPCs.push(new NPC(1))

@@ -18,6 +18,7 @@ export class Doodler {
         this.spawnID = null
         this.width = 75
         this.height = 75
+        this.dying = false
         this.age = 0
         this.speed = 0
         this.boosting = false
@@ -63,7 +64,9 @@ export class Doodler {
                     this.bottom >= npc.bottom &&
                     this.bottom <= npc.bottom + npc.height &&
                     this.left + this.width > npc.left &&
-                    this.left < npc.left + npc.width)
+                    this.left < npc.left + npc.width &&
+                    !npc.dying &&
+                    !this.dying)
                 {
                     if( this.vSpeed < 0 &&
                         this.bottom > npc.bottom + npc.height/2 &&
@@ -73,15 +76,18 @@ export class Doodler {
                             this.kills++;
                             this.scoreDiv.innerHTML = ++this.score;
                         }
-                        npc.die()
-                        return;
+                        npc.dying = true
+                        npc.visual.classList.add('dead')
                     }
-                    npc.killcount.innerHTML = ++npc.kills
-                    this.die()
-                    return
+                    else {
+                        npc.killcount.innerHTML = ++npc.kills
+                        this.dying = true
+                        this.visual.classList.add('deadx`')
+                        break
+                    }
                 }
             }
-            if(this.vSpeed < 0){
+            if(this.vSpeed < 0 && !this.dying){
                 for(let platform of Platforms){
                     if( this.bottom >= platform.bottom &&
                         this.bottom <= platform.bottom + platform.height &&
@@ -106,7 +112,7 @@ export class Doodler {
             const tdelta = (Date.now() - lastTick) / 1000;
             const sdelta = this.vSpeed * tdelta + 0.5 * G * tdelta**2
             this.vSpeed -= G * tdelta
-            this.move(this.speed, sdelta)
+            this.move(this.dying ? 0 : this.speed, sdelta)
             lastTick = Date.now();
             this.age += tdelta
 
@@ -143,8 +149,10 @@ export class Doodler {
     spawn() {
         this.left = MAX_WIDTH * (2 * this.id - 1) / 4
         this.bottom = MAX_HEIGHT/2
-        this.render()
+        this.dying = false
         this.visual.classList.add(`player${this.id}`)
+        this.visual.classList.remove('dead')
         this.age = 0
+        this.render()
     }
 }

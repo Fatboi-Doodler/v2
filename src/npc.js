@@ -13,6 +13,7 @@ export class NPC {
         this.width = 75
         this.height = 75
         this.kills = 0
+        this.dying = false
         this.spawn()
         this.speed = Math.random()>0.5 ? 2 : -2;
     }
@@ -39,7 +40,7 @@ export class NPC {
 
             if(this.bottom < 0 ) this.die();
 
-            if(this.vSpeed < 0){
+            if(this.vSpeed < 0 && !this.dying){
                 for(let platform of Platforms){
                     if( this.bottom >= platform.bottom &&
                         this.bottom <= platform.bottom + platform.height &&
@@ -68,7 +69,9 @@ export class NPC {
     spawn() {
         this.left = Math.random() * MAX_WIDTH;
         this.bottom = MAX_HEIGHT
-        this.render()
         this.visual.classList.add(`npc`)
+        this.dying = false
+        this.visual.classList.remove('dead')
+        this.render()
     }
 }

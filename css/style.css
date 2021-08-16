@@ -14,12 +14,14 @@ html, body {
 .player1 {
     width: 75px;
     height: 75px;
+    background-repeat: no-repeat;
     background-image: url('../img/fatboi.png');
     position: absolute;
 }
 .player2 {
     width: 75px;
     height: 75px;
+    background-repeat: no-repeat;
     background-image: url('../img/kfcboi.png');
     position: absolute;
 }
@@ -52,6 +54,7 @@ html, body {
 .icon1 {
     background-image: url('../img/fatboi.png');
     background-size: 40px;
+    background-repeat: no-repeat;
     width:40px;
     height:40px;
     top:0;
@@ -60,6 +63,7 @@ html, body {
 .icon2 {
     background-image: url('../img/kfcboi.png');
     background-size: 40px;
+    background-repeat: no-repeat;
     width:40px;
     height:40px;
     top:40px;
@@ -87,4 +91,10 @@ html, body {
     top: 35px;
     font-size: 15px;
     color: red
-  }
+}
+.dead {
+    opacity: 0.4;
+}
+.invincible {
+    filter: drop-shadow(0px 0px 10px orange);
+}

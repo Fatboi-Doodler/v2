@@ -1,4 +1,5 @@
 import { Grid, MAX_WIDTH, MAX_HEIGHT, Platforms, NPCs, Drops, IsGameover, G, gameover } from '../index.js'
+import { Character } from './character.js'
 
 const JUMP_SPEED = 250
 const JUMP_BOOST = 200
@@ -10,32 +11,24 @@ let lastDoodlerId = 0
 // gravity
 // S = v0*t + 0.5*gt^2
 // v = v0 + gt
-export class Doodler {
+export class Doodler extends Character {
     constructor() {
 
-        // id
-        this.id = ++lastDoodlerId
+        super(`player${++lastDoodlerId}`)
 
-        // doodler div and geometry
-        this.visual = document.createElement('div')
-        this.visual.classList.add(`player${this.id}`)
-        Grid.appendChild(this.visual)
-        this.height = this.visual.clientHeight
-        this.width = this.visual.clientWidth
+        // id
+        this.id = lastDoodlerId
 
         // properties
-        this.dying = false
         this.invincible = false
         this.age = 0
         this.drops = 0
-        this.speed = 0
         this.boosting = false
         this.crawling = false
 
         // iterval ids
-        this.renderId = null
         this.coolId = null
-        this.spawnID = null
+        this.spawnId = null
         this.invincibleId = null
 
         // cooldown div
@@ -55,15 +48,6 @@ export class Doodler {
 
         // spawn
         this.restart()
-    }
-
-    move(x, y){
-        this.bottom += y;
-        this.left += x;
-        if(this.left < 0) this.left = 0;
-        if(this.left + this.width + 10 > MAX_WIDTH) this.left = MAX_WIDTH - this.width - 10;
-        this.visual.style.bottom = this.bottom + 'px';
-        this.visual.style.left = this.left + 'px';
     }
 
     render() {
@@ -129,8 +113,8 @@ export class Doodler {
                 for(let platform of Platforms){
                     if( this.bottom >= platform.bottom &&
                         this.bottom <= platform.bottom + platform.height &&
-                        this.left + this.width > platform.left &&
-                        this.left < platform.left + platform.width &&
+                        this.left + this.width >= platform.left &&
+                        this.left <= platform.left + platform.width &&
                         !this.crawling)
                     {
                         if(!platform.scored){
@@ -139,10 +123,7 @@ export class Doodler {
                             platform.visual.classList.add(`platform-scored${this.id}`)
                             if(!Platforms.find(platform => platform.scored == 0)) gameover();
                         }
-                        this.vSpeed = JUMP_SPEED
-                        if(this.boosting){
-                            this.vSpeed += JUMP_BOOST;
-                        }
+                        this.vSpeed = JUMP_SPEED + (this.boosting ? JUMP_BOOST : 0)
                     }
                 }
 
@@ -169,7 +150,7 @@ export class Doodler {
 
     die() {
         clearInterval(this.renderId)
-        this.stop()
+        this.visual.classList.remove(`player${this.id}`)
         let countdown = COOLDOWN_SEC
         this.cooldownDiv.classList.add(`countdown`)
         this.cooldownDiv.innerHTML = countdown;
@@ -183,11 +164,6 @@ export class Doodler {
         }, COOLDOWN_SEC * 1000)
     }
 
-    stop() {
-        clearInterval(this.renderId)
-        this.visual.classList.remove(`player${this.id}`)
-    }
-
     restart() {
         this.score = 0;
         this.scoreDiv.innerHTML = "0"
@@ -196,7 +172,7 @@ export class Doodler {
 
     spawn() {
         this.left = MAX_WIDTH * (2 * this.id - 1) / 4
-        this.bottom = MAX_HEIGHT/2
+        this.bottom = MAX_HEIGHT / 2
         this.dying = false
         this.visual.classList.add(`player${this.id}`)
         this.visual.classList.remove('dead')

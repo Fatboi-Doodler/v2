@@ -4,19 +4,21 @@ const MAX_PLATFORM_SPEED = 5;
 
 export class Platform {
     constructor() {
-        this.width = 100
-        this.height = 15
-        this.left = Math.max(0, Math.random() * MAX_WIDTH - this.width)
-        this.bottom = Math.max(0, Math.random() * MAX_HEIGHT - this.height - 100)
+        // visual
+        this.visual = document.createElement('div')
+        this.visual.classList.add('platform')
+        Grid.appendChild(this.visual)
+        this.height = this.visual.clientHeight
+        this.width = this.visual.clientWidth
+        this.left = Math.random() * (MAX_WIDTH - this.width)
+        this.bottom = Math.random() * (MAX_HEIGHT - this.height - 100)
+        this.visual.style.left = this.left + 'px'
+        this.visual.style.bottom = this.bottom + 'px'
+
+        // properties
         this.moving = DIRS[Math.floor(Math.random() * DIRS.length)]
         this.scored = 0
         this.speed = Math.random() * MAX_PLATFORM_SPEED;
-        this.visual = document.createElement('div')
-        const visual = this.visual
-        visual.classList.add('platform')
-        visual.style.left = this.left + 'px'
-        visual.style.bottom = this.bottom + 'px'
-        Grid.appendChild(visual)
     }
 
     update() {

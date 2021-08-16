@@ -4,7 +4,10 @@ let lastDropId = 0
 
 export class Drop {
     constructor() {
+        // id
         this.id = ++lastDropId
+
+        // visual and geometry
         this.visual = document.createElement('div')
         this.visual.classList.add('hotdog')
         Grid.appendChild(this.visual)

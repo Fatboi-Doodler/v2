@@ -1,21 +1,35 @@
 import { Grid, MAX_WIDTH, MAX_HEIGHT, Platforms, G } from '../index.js'
 
+let lastNPCId = 0
 
 export class NPC {
-    constructor(num) {
-        this.id = num
+    constructor() {
+        // id
+        this.id = ++lastNPCId
+
+        // visual
         this.visual = document.createElement('div')
         Grid.appendChild(this.visual)
         this.killcount = document.createElement('span')
         this.killcount.classList.add('killcount')
         this.visual.appendChild(this.killcount)
+        this.visual.classList.add(`npc`)
+        this.height = this.visual.clientHeight
+        this.width = this.visual.clientWidth
+        this.left = Math.random() * (MAX_WIDTH - this.width);
+        this.bottom = MAX_HEIGHT
+
+        // interval id
         this.renderId = null
-        this.width = 75
-        this.height = 75
+
+        // properties
         this.kills = 0
         this.dying = false
+        this.speed = Math.random()>0.5 ? 2 : -2
+        this.vSpeed = 0
+
+        // spawn
         this.spawn()
-        this.speed = Math.random()>0.5 ? 2 : -2;
     }
 
     move(x, y){
@@ -34,8 +48,8 @@ export class NPC {
     }
 
     render() {
-        this.vSpeed = 0
         let lastTick = Date.now();
+        clearInterval(this.renderId)
         this.renderId = setInterval( () => {
 
             if(this.bottom < 0 ) this.die();
@@ -67,10 +81,10 @@ export class NPC {
     }
 
     spawn() {
-        this.left = Math.random() * MAX_WIDTH;
-        this.bottom = MAX_HEIGHT
-        this.visual.classList.add(`npc`)
+        this.vSpeed = 0
         this.dying = false
+        this.bottom = MAX_HEIGHT
+        this.left = Math.random() * (MAX_WIDTH - this.width);
         this.visual.classList.remove('dead')
         this.render()
     }

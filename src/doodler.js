@@ -5,38 +5,55 @@ const JUMP_BOOST = 200
 const COOLDOWN_SEC = 5
 const AGE_INVINCIBILITY_SEC = 3
 const HOTDOG_DURATION_SEC = 5
+let lastDoodlerId = 0
 
 // gravity
 // S = v0*t + 0.5*gt^2
 // v = v0 + gt
 export class Doodler {
-    constructor(num) {
-        this.id = num
+    constructor() {
+
+        // id
+        this.id = ++lastDoodlerId
+
+        // doodler div and geometry
         this.visual = document.createElement('div')
+        this.visual.classList.add(`player${this.id}`)
         Grid.appendChild(this.visual)
+        this.height = this.visual.clientHeight
+        this.width = this.visual.clientWidth
+
+        // properties
+        this.dying = false
+        this.invincible = false
+        this.age = 0
+        this.drops = 0
+        this.speed = 0
+        this.boosting = false
+        this.crawling = false
+
+        // iterval ids
         this.renderId = null
         this.coolId = null
         this.spawnID = null
         this.invincibleId = null
-        this.width = 75
-        this.height = 75
-        this.dying = false
-        this.invincible = false
-        this.age = 0
-        this.speed = 0
-        this.drops = 0
-        this.boosting = false
-        this.crawling = false
+
+        // cooldown div
         this.cooldownDiv = document.createElement('div')
         this.cooldownDiv.style.left = MAX_WIDTH * (2 * this.id - 1) / 4 + "px";
         this.cooldownDiv.style.bottom = MAX_HEIGHT/2 + "px";
+        Grid.appendChild(this.cooldownDiv)
+
+        // score and icon div
+        this.score = 0
         this.scoreDiv = document.createElement('div')
         this.scoreDiv.classList.add(`score${this.id}`)
         const icon = document.createElement('div')
         icon.classList.add(`icon${this.id}`)
         Grid.appendChild(icon)
         Grid.appendChild(this.scoreDiv)
-        Grid.appendChild(this.cooldownDiv)
+
+        // spawn
         this.restart()
     }
 

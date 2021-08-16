@@ -41,7 +41,6 @@ function movePlatforms(){
         for(let platform of Platforms) {
             platform.update();
         }
-
     }, 50)
 }
 
@@ -85,16 +84,16 @@ function keyHandler(e) {
     if (e.key == 'ArrowDown') {
         Players[1].crawling = e.type == "keydown" ? true : false
     }
-    if(e.key == 'a') {
+    if(e.keyCode == 65) {   // A
         Players[0].speed = e.type == "keydown" ? -4 : (Players[0].speed == 4 ? 4 : 0)
     }
-    if (e.key == 'd') {
+    if (e.keyCode == 68) {  // D
         Players[0].speed = e.type == "keydown" ? 4 : (Players[0].speed == -4 ? -4 : 0)
     }
-    if (e.key == 'w') {
+    if (e.keyCode == 87) {  // W
         Players[0].boosting = e.type == "keydown" ? true : false
     }
-    if (e.key == 's') {
+    if (e.keyCode == 83) {  // S
         Players[0].crawling = e.type == "keydown" ? true : false
     }
 
@@ -108,10 +107,10 @@ function start() {
     createPlatforms()
     movePlatforms()
     startDrops()
-    Players.push(new Doodler(1))
-    Players.push(new Doodler(2))
-    NPCs.push(new NPC(1))
-    NPCs.push(new NPC(2))
-    NPCs.push(new NPC(3))
+    Players.push(new Doodler())
+    Players.push(new Doodler())
+    NPCs.push(new NPC())
+    NPCs.push(new NPC())
+    NPCs.push(new NPC())
 }
 start()

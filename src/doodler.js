@@ -5,7 +5,8 @@ const JUMP_SPEED = 250
 const JUMP_BOOST = 200
 const COOLDOWN_SEC = 5
 const AGE_INVINCIBILITY_SEC = 3
-const HOTDOG_DURATION_SEC = 5
+const HOTDOG_DURATION_SEC = 8
+const WINGS_DURATION_SEC = 8
 let lastDoodlerId = 0
 
 // gravity
@@ -25,11 +26,13 @@ export class Doodler extends Character {
         this.drops = 0
         this.boosting = false
         this.crawling = false
+        this.flying = false
 
         // iterval ids
         this.coolId = null
         this.spawnId = null
         this.invincibleId = null
+        this.flyingId = null
 
         // cooldown div
         this.cooldownDiv = document.createElement('div')
@@ -74,7 +77,8 @@ export class Doodler extends Character {
                     item.destroy()
                     Drops.splice(i, 1)
                     this.drops++
-                    this.setInvincible(HOTDOG_DURATION_SEC * 1000)
+                    if(item.type == "hotdog") this.setInvincible(HOTDOG_DURATION_SEC * 1000)
+                    if(item.type == "wings") this.setFlying(WINGS_DURATION_SEC * 1000)
                     break;
                 }
             }
@@ -128,8 +132,12 @@ export class Doodler extends Character {
 
             }
             const tdelta = (Date.now() - lastTick) / 1000;
-            const sdelta = this.vSpeed * tdelta + 0.5 * G * tdelta**2
+            let sdelta = this.vSpeed * tdelta + 0.5 * G * tdelta**2
             this.vSpeed -= G * tdelta
+            if(this.flying && !this.dying){
+                this.vSpeed = this.boosting ? 8 : -8
+                sdelta = this.boosting ? 2 : -2
+            }
             this.move(this.dying ? 0 : this.speed, sdelta)
             lastTick = Date.now();
             this.age += tdelta
@@ -144,6 +152,17 @@ export class Doodler extends Character {
         this.invincibleId = setTimeout(() => {
             this.visual.classList.remove(`invincible`)
             this.invincible = false
+            this.crawling = false
+        }, duration)
+    }
+
+    setFlying(duration) {
+        this.visual.classList.add('flying')
+        clearTimeout(this.flyingId)
+        this.flying = true
+        this.flyingId = setTimeout(() => {
+            this.visual.classList.remove(`flying`)
+            this.flying = false
             this.crawling = false
         }, duration)
     }

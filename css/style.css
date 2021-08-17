@@ -43,6 +43,9 @@ html, body {
 .drop-pizza {
     background-image: url('../img/pizza.png');
 }
+.drop-wings {
+    background-image: url('../img/wings.png');
+}
 .platform {
     width: 85px;
     height: 15px;
@@ -108,4 +111,7 @@ html, body {
 }
 .invincible {
     filter: drop-shadow(0px 0px 10px blue);
+}
+.flying {
+    filter: drop-shadow(0px 0px 10px red);
 }

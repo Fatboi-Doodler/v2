@@ -1,7 +1,7 @@
 import { Grid, MAX_WIDTH, MAX_HEIGHT } from '../index.js'
 
 let lastDropId = 0
-const DROP_TYPES = ["hotdog", "pizza"]
+const DROP_TYPES = ["hotdog", /*"pizza",*/ "wings"]
 
 export class Drop {
     constructor() {

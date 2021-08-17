@@ -51,7 +51,6 @@ export class Doodler extends Character {
     }
 
     render() {
-        this.vSpeed = 0
         let lastTick = Date.now();
         this.cooldownDiv.innerHTML = ''
         clearInterval(this.coolId)
@@ -60,8 +59,8 @@ export class Doodler extends Character {
         this.renderId = setInterval( () => {
 
             if( this.bottom < 0 ){
-                this.die()
-                return
+                if(this.invincible) this.bottom = MAX_HEIGHT;
+                else this.die()
             }
 
             for(let i in Drops){
@@ -145,6 +144,7 @@ export class Doodler extends Character {
         this.invincibleId = setTimeout(() => {
             this.visual.classList.remove(`invincible`)
             this.invincible = false
+            this.crawling = false
         }, duration)
     }
 
@@ -177,6 +177,7 @@ export class Doodler extends Character {
         this.visual.classList.add(`player${this.id}`)
         this.visual.classList.remove('dead')
         this.age = 0
+        this.vSpeed = 0
         this.render()
     }
 }

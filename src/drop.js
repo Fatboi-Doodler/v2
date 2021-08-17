@@ -1,15 +1,19 @@
 import { Grid, MAX_WIDTH, MAX_HEIGHT } from '../index.js'
 
 let lastDropId = 0
+const DROP_TYPES = ["hotdog", "pizza"]
 
 export class Drop {
     constructor() {
         // id
         this.id = ++lastDropId
 
+        this.type = DROP_TYPES[Math.floor(Math.random() * DROP_TYPES.length)]
+
         // visual and geometry
         this.visual = document.createElement('div')
-        this.visual.classList.add('hotdog')
+        this.visual.classList.add(`drop`)
+        this.visual.classList.add(`drop-${this.type}`)
         Grid.appendChild(this.visual)
         this.height = this.visual.clientHeight
         this.width = this.visual.clientWidth

@@ -20,9 +20,6 @@ const PLATFORM_COUNT = Math.floor( MAX_WIDTH / 50) || PLATFORM_COUNT
 const GameoverDiv = document.createElement('div')
 Grid.appendChild(GameoverDiv)
 
-let DropsId = null
-
-
 function createPlatforms() {
     for(let i = 0; i < PLATFORM_COUNT; i++) {
         Platforms.push(new Platform())
@@ -31,7 +28,7 @@ function createPlatforms() {
 
 function startDrops() {
 
-    DropsId = setInterval(() => {
+    setInterval(() => {
         if(Drops.length < MAX_DROPS) Drops.push(new Drop())
     }, DROP_INTERVAL_SEC * 1000)
 }

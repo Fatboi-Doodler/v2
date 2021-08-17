@@ -31,13 +31,17 @@ html, body {
     background-image: url('../img/opdude.png');
     position: absolute;
 }
-.hotdog {
+.drop {
     width: 50px;
     height: 50px;
     background-size: 50px;
-    background-image: url('../img/hotdog.png');
-    background-repeat: no-repeat;
     position: absolute;
+}
+.drop-hotdog {
+    background-image: url('../img/hotdog.png');
+}
+.drop-pizza {
+    background-image: url('../img/pizza.png');
 }
 .platform {
     width: 85px;

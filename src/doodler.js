@@ -7,6 +7,7 @@ const COOLDOWN_SEC = 5
 const AGE_INVINCIBILITY_SEC = 3
 const HOTDOG_DURATION_SEC = 8
 const WINGS_DURATION_SEC = 8
+const PIZZA_DURATION_SEC = 8
 let lastDoodlerId = 0
 
 // gravity
@@ -27,12 +28,15 @@ export class Doodler extends Character {
         this.boosting = false
         this.crawling = false
         this.flying = false
+        this.bombing = false
 
         // iterval ids
         this.coolId = null
         this.spawnId = null
         this.invincibleId = null
         this.flyingId = null
+        this.bombingId = null
+
 
         // cooldown div
         this.cooldownDiv = document.createElement('div')
@@ -62,7 +66,7 @@ export class Doodler extends Character {
         this.renderId = setInterval( () => {
 
             if( this.bottom < 0 ){
-                if(this.invincible) this.bottom = MAX_HEIGHT;
+                if(this.bombing && !this.dying) this.bottom = MAX_HEIGHT;
                 else this.die()
             }
 
@@ -79,6 +83,7 @@ export class Doodler extends Character {
                     this.drops++
                     if(item.type == "hotdog") this.setInvincible(HOTDOG_DURATION_SEC * 1000)
                     if(item.type == "wings") this.setFlying(WINGS_DURATION_SEC * 1000)
+                    if(item.type == "pizza") this.setBombing(PIZZA_DURATION_SEC * 1000)
                     break;
                 }
             }
@@ -93,6 +98,7 @@ export class Doodler extends Character {
                     !this.dying)
                 {
                     if( this.invincible ||
+                        this.bombing ||
                         this.vSpeed < 0 &&
                         this.bottom > npc.bottom + npc.height/2 &&
                         this.bottom <= npc.bottom + npc.height)
@@ -118,7 +124,8 @@ export class Doodler extends Character {
                         this.bottom <= platform.bottom + platform.height &&
                         this.left + this.width >= platform.left &&
                         this.left <= platform.left + platform.width &&
-                        !this.crawling)
+                        !this.crawling &&
+                        !this.bombing)
                     {
                         if(!platform.scored){
                             if(!IsGameover) this.scoreDiv.innerHTML = ++this.score;
@@ -136,7 +143,7 @@ export class Doodler extends Character {
             this.vSpeed -= G * tdelta
             if(this.flying && !this.dying){
                 this.vSpeed = this.boosting ? 8 : -8
-                sdelta = this.boosting ? 2 : -2
+                sdelta = this.boosting ? 3 : -3
             }
             this.move(this.dying ? 0 : this.speed, sdelta)
             lastTick = Date.now();
@@ -164,6 +171,17 @@ export class Doodler extends Character {
             this.visual.classList.remove(`flying`)
             this.flying = false
             this.crawling = false
+        }, duration)
+    }
+
+    setBombing(duration) {
+        this.visual.classList.add('bombing')
+        clearTimeout(this.bombingId)
+        this.bombing = true
+        this.bombingId = setTimeout(() => {
+            this.visual.classList.remove(`bombing`)
+            this.bombing = false
+            this.bottom = MAX_HEIGHT
         }, duration)
     }
 

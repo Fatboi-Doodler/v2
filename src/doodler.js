@@ -103,10 +103,8 @@ export class Doodler extends Character {
                         this.bottom > npc.bottom + npc.height/2 &&
                         this.bottom <= npc.bottom + npc.height)
                     {
-                        if(!IsGameover){
-                            this.kills++;
-                            this.scoreDiv.innerHTML = ++this.score;
-                        }
+                        this.kills++;
+                        this.scoreDiv.innerHTML = ++this.score;
                         npc.dying = true
                         npc.visual.classList.add('dead')
                     }
